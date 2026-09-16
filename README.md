@@ -92,7 +92,7 @@ A prévia fica em **http://127.0.0.1:4173**. Publique o conteúdo de `dist/` em 
 
 ### GitHub Pages
 
-O projeto inclui [o workflow de publicação](.github/workflows/static.yml). Ele instala as dependências com o lockfile, executa os testes de dados, compila o site e publica somente `dist/` a cada push para `main` ou `master`. O caminho é obtido das configurações de Pages: funciona em `/nome-do-repositorio/`, na raiz de um repositório `usuario.github.io` e em um domínio próprio configurado no GitHub.
+O projeto inclui [o workflow de publicação](.github/workflows/static.yml). Ele instala as dependências com o lockfile, executa os testes de dados, compila o site e publica somente `dist/` a cada push para `main` ou `master`. O caminho `/noetica/` está definido explicitamente para o endereço deste repositório no GitHub Pages.
 
 1. No GitHub, abra **Settings → Actions → General**. Em **Actions permissions**, habilite a execução de workflows e salve. O workflow usa ações de `actions/*` e `pnpm/action-setup@v4`; elas precisam estar permitidas. A mensagem da imagem indica um bloqueio de Actions que não pode ser removido por um arquivo do projeto. Se a configuração estiver bloqueada por uma organização, o administrador precisa liberá-la.
 2. Em **Settings → Pages → Build and deployment → Source**, escolha **GitHub Actions**. Não é necessário adicionar os modelos “Jekyll” ou “Static HTML”: este projeto já fornece o workflow de build.

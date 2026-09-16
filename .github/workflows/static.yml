@@ -44,7 +44,8 @@ jobs:
 
       - name: Gerar o site
         env:
-          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # Este é um site de projeto: https://kauaevertondelira.github.io/noetica/
+          VITE_BASE_PATH: /noetica/
         run: pnpm build
 
       - name: Preparar artefato do Pages
@@ -62,5 +63,4 @@ jobs:
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
-
 
