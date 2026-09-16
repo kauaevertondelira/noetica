@@ -36,7 +36,7 @@ Leitura, desafios, quizzes, laboratório isolado, notas, progresso, XP, retomada
 
 ## Publicação no GitHub Pages
 
-- Workflow `.github/workflows/deploy-pages.yml` com instalação reproduzível, testes de dados, build Vite e publicação de `dist/` em pushes para `main` ou `master` e execução manual.
+- Workflow `.github/workflows/static.yml` com instalação reproduzível, testes de dados, build Vite e publicação de `dist/` em pushes para `main` ou `master` e execução manual.
 - Caminho de publicação consultado nas configurações do Pages, atendendo sites de repositório, `usuario.github.io` e domínio próprio.
 - Links, fontes, imagens, vídeo e navegação Swup funcionando na subpasta do repositório. Corrigidos também o destaque da trilha na sala de aula e o foco do atalho de acessibilidade.
 - `.nojekyll` incluído na build. As páginas-fonte mantêm a base local após uma compilação para subpasta.

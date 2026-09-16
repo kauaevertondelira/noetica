@@ -4,14 +4,20 @@ Escola introdutória de programação com IA. A identidade original — preto, d
 
 ## Executar
 
-Requisito: **Node.js 22.12 ou superior**. Abra um terminal nesta pasta:
+### Forma mais simples no Windows
+
+Dê dois cliques em **`INICIAR.bat`**. Ele abre o navegador automaticamente e usa o Node já disponível no ambiente do Codex. Mantenha a janela preta aberta enquanto estiver usando o site; pressione `Ctrl+C` para encerrar.
+
+O erro **“npm não é reconhecido”** significa que o Node.js/npm não está instalado no Windows ou não entrou no `PATH`. Não é um erro do HTML, GSAP, Swup ou Vite. O atalho acima não precisa do comando `npm` quando as dependências desta pasta já estão instaladas.
+
+Para preparar a pasta em outro computador, instale **Node.js 22.12 ou superior**, feche e abra o Prompt de Comando e confirme com `node --version` e `npm --version`. Depois execute, uma única vez:
 
 ```sh
 npm install
 npm run dev
 ```
 
-Abra **http://127.0.0.1:5173**. No Windows, também é possível executar `./INICIAR.ps1` no PowerShell. Esse atalho encontra o Node disponível no computador e usa as dependências já instaladas.
+Nos acessos seguintes, use `INICIAR.bat` ou execute `npm run dev`. O site ficará em **http://127.0.0.1:5173**.
 
 O projeto tem `pnpm-lock.yaml`. Para uma instalação reproduzível com pnpm:
 
@@ -20,7 +26,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Não abra o `index.html` por `file://`: módulos, navegação e assets precisam de um servidor HTTP. A aplicação funciona na raiz do domínio ou em uma subpasta definida na build.
+Não abra o `index.html` por `file://`: módulos JavaScript modernos, navegação e assets precisam de um servidor HTTP. Isso também seria necessário em uma reorganização apenas com arquivos `.html`, `.css` e `.js`. O código do projeto já usa esses três formatos; Vite entra somente como servidor de desenvolvimento e gerador da pasta `dist/`. GSAP e Swup continuam como bibliotecas JavaScript da interface.
 
 ## O que funciona no acesso livre
 
@@ -86,16 +92,16 @@ A prévia fica em **http://127.0.0.1:4173**. Publique o conteúdo de `dist/` em 
 
 ### GitHub Pages
 
-O projeto inclui [o workflow de publicação](.github/workflows/deploy-pages.yml). Ele instala as dependências com o lockfile, executa os testes de dados, compila o site e publica somente `dist/` a cada push para `main` ou `master`. O caminho é obtido das configurações de Pages: funciona em `/nome-do-repositorio/`, na raiz de um repositório `usuario.github.io` e em um domínio próprio configurado no GitHub.
+O projeto inclui [o workflow de publicação](.github/workflows/static.yml). Ele instala as dependências com o lockfile, executa os testes de dados, compila o site e publica somente `dist/` a cada push para `main` ou `master`. O caminho é obtido das configurações de Pages: funciona em `/nome-do-repositorio/`, na raiz de um repositório `usuario.github.io` e em um domínio próprio configurado no GitHub.
 
 1. No GitHub, abra **Settings → Actions → General**. Em **Actions permissions**, habilite a execução de workflows e salve. O workflow usa ações de `actions/*` e `pnpm/action-setup@v4`; elas precisam estar permitidas. A mensagem da imagem indica um bloqueio de Actions que não pode ser removido por um arquivo do projeto. Se a configuração estiver bloqueada por uma organização, o administrador precisa liberá-la.
 2. Em **Settings → Pages → Build and deployment → Source**, escolha **GitHub Actions**. Não é necessário adicionar os modelos “Jekyll” ou “Static HTML”: este projeto já fornece o workflow de build.
-3. Envie os arquivos do projeto para a raiz da branch `main` ou `master`, incluindo **`.github/workflows/deploy-pages.yml`**, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `vite.config.js`, `index.html`, `scripts/`, `tests/`, `public/` e `IMG/`. Não envie `node_modules/`, `.local/`, `.env`, `dist/` ou relatórios de testes. O `.gitignore` já os exclui quando você usa Git.
-4. Em **Actions**, acompanhe **Publicar no GitHub Pages**. Se o código já estava enviado antes da ativação de Actions, abra o workflow e use **Run workflow** na branch publicada, ou faça um novo push. Se existir um workflow antigo de Jekyll/publicação, remova-o para evitar duas publicações concorrentes.
+3. Envie os arquivos do projeto para a raiz da branch `main` ou `master`, incluindo **`.github/workflows/static.yml`**, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `vite.config.js`, `index.html`, `scripts/`, `tests/`, `public/` e `IMG/`. Não envie `node_modules/`, `.local/`, `.env`, `dist/` ou relatórios de testes. O `.gitignore` já os exclui quando você usa Git.
+4. Em **Actions**, acompanhe **Publicar Noética no GitHub Pages**. Se o código já estava enviado antes da ativação de Actions, abra o workflow e use **Run workflow** na branch publicada, ou faça um novo push. Remova o workflow de Jekyll; dois workflows publicando o mesmo endereço podem fazer a versão errada substituir a correta.
 5. Aguarde os jobs `build` e `deploy` ficarem verdes. O link fica em **Settings → Pages → Visit site** e no ambiente `github-pages`. Em um repositório comum, será `https://<seu-usuario>.github.io/<nome-do-repositorio>/`.
 6. Para mostrar o projeto no perfil, coloque esse link no campo **Website** da seção **About** do repositório e fixe o repositório em seu perfil.
 
-Se usar o upload pelo navegador, confirme depois que `.github/workflows/deploy-pages.yml` existe no repositório. Envie o conteúdo da pasta do projeto, mantendo a estrutura das subpastas; enviar somente `index.html` não publica a aplicação completa. Caso o upload omita a pasta oculta, use **Add file → Create new file**, informe `.github/workflows/deploy-pages.yml` e copie o conteúdo do arquivo local.
+Se usar o upload pelo navegador, confirme depois que `.github/workflows/static.yml` contém as etapas **Configurar Node.js**, **Instalar dependências**, **Gerar o site** e o upload com `path: dist`. Envie o conteúdo da pasta do projeto mantendo as subpastas; enviar somente `index.html` não publica a aplicação completa. Caso o upload omita a pasta oculta, abra o arquivo `.github/workflows/static.yml` no GitHub, use o lápis de edição, substitua todo o conteúdo pelo arquivo local e confirme o commit.
 
 Se você ativar as contas Firebase, inclua também `<seu-usuario>.github.io` em Authentication → Settings → Authorized domains. O Firebase autoriza domínios, sem o segmento do nome do repositório.
 
