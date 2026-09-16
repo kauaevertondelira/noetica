@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function bounded(value, minimum, maximum) { return value is string && value.size() >= minimum && value.size() <= maximum; }
+    function validStudy(s) {
+      return s is map
+        && s.keys().hasOnly(['version', 'name', 'completed', 'notes', 'code', 'answers', 'lastLesson', 'scratchpad', 'projects', 'saved', 'copied'])
+        && s.version == 2 && bounded(s.name, 0, 60)
+        && s.completed is list && s.completed.size() <= 12
+        && s.notes is map && s.notes.size() <= 12
+        && s.code is map && s.code.size() <= 12
+        && s.answers is map && s.answers.size() <= 12
+        && bounded(s.lastLesson, 1, 60) && bounded(s.scratchpad, 0, 20000)
+        && s.projects is list && s.projects.size() <= 50
+        && s.saved is list && s.saved.size() <= 6
+        && s.copied is list && s.copied.size() <= 6;
+    }
+    match /users/{uid} {
+      allow read: if owner(uid);
+      allow create: if owner(uid)
+        && request.resource.data.keys().hasOnly(['name', 'study', 'updatedAt'])
+        && bounded(request.resource.data.name, 1, 100)
+        && validStudy(request.resource.data.study)
+        && request.resource.data.updatedAt == request.time;
+      allow update: if owner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'study', 'updatedAt'])
+        && bounded(request.resource.data.name, 1, 100)
+        && validStudy(request.resource.data.study)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if owner(uid);
+    }
+    match /posts/{postId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['title', 'content', 'topic', 'userId', 'authorName', 'createdAt'])
+        && request.resource.data.userId == request.auth.uid
+        && bounded(request.resource.data.title, 8, 140)
+        && bounded(request.resource.data.content, 20, 5000)
+        && bounded(request.resource.data.authorName, 1, 100)
+        && request.resource.data.topic in ['Primeiros passos', 'Código e bugs', 'Ferramentas', 'Projetos']
+        && request.resource.data.createdAt == request.time;
+      allow delete: if owner(resource.data.userId);
+      match /replies/{replyId} {
+        function parentExists() { return exists(/databases/$(database)/documents/posts/$(postId)); }
+        allow read: if signedIn() && parentExists();
+        allow create: if signedIn() && parentExists()
+          && request.resource.data.keys().hasOnly(['content', 'userId', 'authorName', 'createdAt'])
+          && request.resource.data.userId == request.auth.uid
+          && bounded(request.resource.data.content, 3, 3000)
+          && bounded(request.resource.data.authorName, 1, 100)
+          && request.resource.data.createdAt == request.time;
+        allow delete: if owner(resource.data.userId);
+      }
+    }
+    // Curriculum is bundled with the site. Legacy writes and role escalation are denied.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
