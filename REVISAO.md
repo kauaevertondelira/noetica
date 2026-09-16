@@ -26,12 +26,24 @@ Leitura, desafios, quizzes, laboratório isolado, notas, progresso, XP, retomada
 
 - **12 testes de dados aprovados.**
 - **15 cenários de navegador aprovados**, executados no Edge em modo automatizado sobre a build de produção.
+- **4 cenários de GitHub Pages aprovados**, em servidor estático montado em `/noetica-pages-check/`, com erro 404 para caminhos fora da subpasta.
 - Cobertura das 12 aulas, rotas diretas, navegação Swup, voltar no histórico, persistência, laboratório, projetos, filtros, clipboard e backup.
 - Verificação de ausência de rolagem horizontal em 360, 390 e 768 pixels nas telas principais.
 - Inspeção visual da página inicial em desktop e celular, galeria e sala de aula.
 - Testes de conta com serviço simulado: separação visitante/conta, falhas de autenticação, falhas de leitura/escrita e recuperação.
 - Build final aprovada, sem alertas de tamanho de bundle. Arquivos Firebase carregados apenas quando necessários.
 - Instalação conferida com o lockfile em modo offline.
+
+## Publicação no GitHub Pages
+
+- Workflow `.github/workflows/deploy-pages.yml` com instalação reproduzível, testes de dados, build Vite e publicação de `dist/` em pushes para `main` ou `master` e execução manual.
+- Caminho de publicação consultado nas configurações do Pages, atendendo sites de repositório, `usuario.github.io` e domínio próprio.
+- Links, fontes, imagens, vídeo e navegação Swup funcionando na subpasta do repositório. Corrigidos também o destaque da trilha na sala de aula e o foco do atalho de acessibilidade.
+- `.nojekyll` incluído na build. As páginas-fonte mantêm a base local após uma compilação para subpasta.
+- Reexecutados os 12 testes de dados, 15 cenários gerais de navegador e 4 cenários de publicação: **31 aprovados**. Build final gerada em `dist/`.
+- README atualizado com ativação de Actions, envio da pasta oculta `.github`, acompanhamento do deploy e registro do link no perfil.
+
+A mensagem enviada pelo usuário indica que Actions precisa ser habilitado no GitHub. O código local não altera essa configuração. Sem um repositório remoto vinculado, a publicação externa e suas permissões não foram executadas ou verificadas.
 
 ## Limite da validação
 

@@ -20,7 +20,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Não abra o `index.html` por `file://`: módulos, navegação e assets precisam de um servidor HTTP. A aplicação usa URLs a partir da raiz do domínio.
+Não abra o `index.html` por `file://`: módulos, navegação e assets precisam de um servidor HTTP. A aplicação funciona na raiz do domínio ou em uma subpasta definida na build.
 
 ## O que funciona no acesso livre
 
@@ -80,9 +80,28 @@ npm run build
 npm run preview
 ```
 
-A prévia fica em **http://127.0.0.1:4173**. Publique o conteúdo de `dist/` em um servidor estático na raiz do domínio, mantendo `public/pages/*.html`, `assets/` e `IMG/`.
+A prévia fica em **http://127.0.0.1:4173**. Publique o conteúdo de `dist/` em um servidor estático, mantendo `public/pages/*.html`, `assets/` e `IMG/`. A build usa a raiz do domínio por padrão. Para uma subpasta, defina `VITE_BASE_PATH=/nome-do-repositorio/` no ambiente antes de compilar. No GitHub Actions, o workflow identifica esse caminho automaticamente.
 
 `firebase.json` contém uma configuração opcional de Firebase Hosting e o caminho das regras. Não há publicação automática. Use a CLI do Firebase autenticada na conta responsável apenas quando for disponibilizar o serviço e confirmar o projeto de destino.
+
+### GitHub Pages
+
+O projeto inclui [o workflow de publicação](.github/workflows/deploy-pages.yml). Ele instala as dependências com o lockfile, executa os testes de dados, compila o site e publica somente `dist/` a cada push para `main` ou `master`. O caminho é obtido das configurações de Pages: funciona em `/nome-do-repositorio/`, na raiz de um repositório `usuario.github.io` e em um domínio próprio configurado no GitHub.
+
+1. No GitHub, abra **Settings → Actions → General**. Em **Actions permissions**, habilite a execução de workflows e salve. O workflow usa ações de `actions/*` e `pnpm/action-setup@v4`; elas precisam estar permitidas. A mensagem da imagem indica um bloqueio de Actions que não pode ser removido por um arquivo do projeto. Se a configuração estiver bloqueada por uma organização, o administrador precisa liberá-la.
+2. Em **Settings → Pages → Build and deployment → Source**, escolha **GitHub Actions**. Não é necessário adicionar os modelos “Jekyll” ou “Static HTML”: este projeto já fornece o workflow de build.
+3. Envie os arquivos do projeto para a raiz da branch `main` ou `master`, incluindo **`.github/workflows/deploy-pages.yml`**, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `vite.config.js`, `index.html`, `scripts/`, `tests/`, `public/` e `IMG/`. Não envie `node_modules/`, `.local/`, `.env`, `dist/` ou relatórios de testes. O `.gitignore` já os exclui quando você usa Git.
+4. Em **Actions**, acompanhe **Publicar no GitHub Pages**. Se o código já estava enviado antes da ativação de Actions, abra o workflow e use **Run workflow** na branch publicada, ou faça um novo push. Se existir um workflow antigo de Jekyll/publicação, remova-o para evitar duas publicações concorrentes.
+5. Aguarde os jobs `build` e `deploy` ficarem verdes. O link fica em **Settings → Pages → Visit site** e no ambiente `github-pages`. Em um repositório comum, será `https://<seu-usuario>.github.io/<nome-do-repositorio>/`.
+6. Para mostrar o projeto no perfil, coloque esse link no campo **Website** da seção **About** do repositório e fixe o repositório em seu perfil.
+
+Se usar o upload pelo navegador, confirme depois que `.github/workflows/deploy-pages.yml` existe no repositório. Envie o conteúdo da pasta do projeto, mantendo a estrutura das subpastas; enviar somente `index.html` não publica a aplicação completa. Caso o upload omita a pasta oculta, use **Add file → Create new file**, informe `.github/workflows/deploy-pages.yml` e copie o conteúdo do arquivo local.
+
+Se você ativar as contas Firebase, inclua também `<seu-usuario>.github.io` em Authentication → Settings → Authorized domains. O Firebase autoriza domínios, sem o segmento do nome do repositório.
+
+O código-fonte precisa de compilação. Por isso, a configuração preparada usa GitHub Actions; apontar “Deploy from a branch” para a pasta do código-fonte não executa a build Vite. A build inclui `.nojekyll`, mas esse arquivo não habilita Actions. Os passos acima seguem a [documentação de permissões do GitHub Actions](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository) e o [guia de publicação do Vite no Pages](https://vite.dev/guide/static-deploy.html#github-pages).
+
+**Estado da entrega:** configuração e testes locais concluídos. Esta pasta não está vinculada a um repositório Git; nenhuma permissão de conta ou publicação remota foi alterada.
 
 As dependências GSAP e Swup e as fontes Inter são empacotadas localmente. O Firebase é carregado sob demanda. Firestore Lite é suficiente para as leituras e escritas pontuais; o armazenamento local e a recuperação de falhas ficam a cargo da aplicação.
 
@@ -110,6 +129,7 @@ npm test
 npm run build
 npx playwright install chromium
 npm run test:e2e
+npm run test:pages
 ```
 
 No Windows, é possível usar o Edge já instalado:
@@ -117,11 +137,13 @@ No Windows, é possível usar o Edge já instalado:
 ```powershell
 $env:PLAYWRIGHT_CHANNEL = 'msedge'
 npm run test:e2e
+npm run test:pages
 ```
 
 - Testes de dados: conteúdo, conclusão, XP, importações, URLs, armazenamento e isolamento por usuário.
 - Testes de navegador: navegação Swup, rotas diretas, todas as aulas, laboratório, projetos, filtros, clipboard, notas, backup, formulários, telas pequenas e animações.
 - Testes de contas: serviço Firebase simulado exclusivamente no navegador de teste, incluindo falhas e recuperação. Arquivos de teste não entram na build.
+- Testes de GitHub Pages: build em `.local/pages-check/`, servida em uma subpasta sem redirecionamento automático para a página inicial; verificam assets, vídeo, nove páginas, navegação Swup, histórico, links de aulas, foco de teclado e criação de projetos. O teste preserva a build normal em `dist/`.
 - Capturas para inspeção: `.local/screenshots/`.
 
 ### Referências técnicas consultadas

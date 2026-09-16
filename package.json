@@ -10,6 +10,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "test:e2e": "playwright test",
+    "test:pages": "node --test tests/hosting/*.test.mjs",
     "pages": "node scripts/pages.mjs"
   },
   "dependencies": {
